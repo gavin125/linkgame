@@ -1,7 +1,7 @@
 var gamebase={
-    x:8,//每行多少列
-    y:5,//每列多少行
-    z:4,//每个相同元素出现的次数
+    x:10,//每行多少列
+    y:6,//每列多少行
+    z:6,//每个相同元素出现的次数
     l:0.8,//游戏满盈率，最大为1(表示没有空白)，需要注意x*y*l%z=0
     gameMap:null,
     createGame:function(x,y,z,l){
@@ -54,9 +54,11 @@ var gamebase={
         //添加dom，设置游戏地图
         for(var i=0;i<y;i++){
             for(var j=0;j<x;j++){
-                $(".game").append("<li class=list"+arrmap[i+1][j+1]+"><i></i>"+arrmap[i+1][j+1]+"</li>")
+                $(".game").append("<li class=list"+arrmap[i+1][j+1]+"><i></i></li>")
             }
         }
+        //添加连线dom
+        $(".game").append("<li class='line'></li><li class='line'></li><li class='line'></li>")
     }
 };
 gamebase.createGame(gamebase.x,gamebase.y,gamebase.z,gamebase.l);//创建游戏
