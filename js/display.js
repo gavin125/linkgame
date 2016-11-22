@@ -1,12 +1,11 @@
 var LinkGame=function(x,y,z,l,dom){
-    this.x=x;//每行多少列
-    this.y=y;//每列多少行
+    this.x=x;//列数
+    this.y=y;//行数
+    this.l=l/100;//游戏满盈率，最大为1(表示没有空白)，需要注意x*y*l%z=0
     this.z=z;//每个相同元素出现的次数
-    this.l=l;//游戏满盈率，最大为1(表示没有空白)，需要注意x*y*l%z=0
     this.dom=dom;
     this.gameinit();
-    this.gamecontrol()
-    
+    this.gamecontrol()    
 }
 
 LinkGame.prototype={
@@ -20,6 +19,7 @@ LinkGame.prototype={
     gamearrmap:function(){
         var that=this;
         var arrmap=[];// 生成虚拟二维数组（比实际数组大一圈，方便连线计算）,并初始值均为0
+
         for(var i=0; i<that.y+2;i++){
             arrmap[i]=[];
             for(var j=0;j<that.x+2;j++){
@@ -27,28 +27,31 @@ LinkGame.prototype={
             }
         }
 
+
         var arrbase=[];// 生成基础数据一维数组
         var max=that.x*that.y*that.l/that.z;
         for(var m=0;m<that.z;m++){
             for(var n=0;n<max;n++)
-                arrbase[n+m*max]=n;
+                arrbase[n+m*max]=n+1;
         }
 
         var arrorder=[];//生成乱序数组
-        var arrtemp=[];//临时数组
-        for(var h=0;h<that.x*that.y;h++){arrtemp[h]=h+1;}
+        var arrtemp=[];//顺序数组（临时使用）
+        for(var h=0;h<that.x*that.y;h++){arrtemp[h]=h;}
         for(var g=0;g<that.x*that.y;g++){
+            //从顺序数组中随机位置拿一个数，最后生成乱序数组
             var temp=Math.floor(Math.random()*arrtemp.length);
             arrorder.push(arrtemp.splice(temp,1)[0])
         }
+
 
         //根据此顺序将基础数组添加到地图数组
         for(var o=0;o<arrbase.length;o++){
             arrmap[Math.floor(arrorder[o]/that.x)+1][(arrorder[o]%that.x+1)]=arrbase[o]
         }
 
-        console.log(arrbase+"\n"+arrorder)
-        that.drawArr(arrmap)
+        console.log("基础数据："+arrbase+"\n位置乱序："+arrorder)
+        //that.drawArr(arrmap)
         that.arrmap=arrmap;
     },
     renderdom:function(){
@@ -95,12 +98,11 @@ LinkGame.prototype={
     getconnect:function(a,b){
         var that=this;
         var isopen=false;
-        console.log(a.index()+"--"+ b.index());
         var ai=parseInt(a.index()/that.x)+1;//因为虚拟地图比实际大一圈，所以都+1
         var aj=a.index()%that.x+1;
         var bi=parseInt(b.index()/that.x)+1;
         var bj=b.index()%that.x+1;
-        console.log(ai+","+aj+"---"+bi+","+bj);
+        console.log("当前对比("+ai+","+aj+")和("+bi+","+bj+")");
         if(that.arrmap[ai][aj]!= that.arrmap[bi][bj]){
             console.log("两次选择内容不同，不可消除");
             return false;
@@ -207,8 +209,15 @@ LinkGame.prototype={
 
 }
 
-var game=new LinkGame(10,5,4,0.8,$(".game"))
+var game=new LinkGame(10,5,4,80,$(".game"))
 
+$("#setgame").click(function(e){
+    e.preventDefault(); 
+    $(".game").html("");
+    console.log($("#num_V").val()+","+$("#num_h").val()+","+$("#again").val()+","+$("#percent").val())
+    var g=new LinkGame($("#num_V").val(),$("#num_h").val(),$("#again").val(),$("#percent").val(),$(".game"))
+    
+})
 
 
 
